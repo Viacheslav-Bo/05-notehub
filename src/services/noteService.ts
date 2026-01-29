@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { Note } from "../types/note";
 
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
@@ -17,3 +18,11 @@ const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 // deleteNote: має виконувати запит для видалення нотатки за заданим ідентифікатором.
 // Приймає ID нотатки та повертає інформацію про видалену нотатку у відповіді.
+
+export interface FetchNotesResponse { };
+export interface CreateNotesResponse { };
+export interface DeleteNotesResponse { };
+
+export default function fetchNotes(query, page) { };
+export default function createNote= async (): Promise<Note> => { };
+export default function deleteNote(id) { };
