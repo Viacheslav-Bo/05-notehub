@@ -1,5 +1,6 @@
 import axios from "axios";
-import type { Note } from "../types/note";
+import type { Note, NoteTag } from "../types/note";
+// import { number, string } from "yup";
 
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
@@ -19,10 +20,67 @@ const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 // deleteNote: має виконувати запит для видалення нотатки за заданим ідентифікатором.
 // Приймає ID нотатки та повертає інформацію про видалену нотатку у відповіді.
 
-export interface FetchNotesResponse { };
-export interface CreateNotesResponse { };
-export interface DeleteNotesResponse { };
+export interface FetchNoteParams {
+  page: number;
+  perPage: number;
+  search?: string;
+}
 
-export default function fetchNotes(query, page) { };
-export default function createNote= async (): Promise<Note> => { };
-export default function deleteNote(id) { };
+export interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
+  page: number;
+  perPage: number;
+  totalItems: number;
+}
+
+export interface CreateNotePayload {
+  title: string;
+  content?: string;
+  tag: NoteTag;
+}
+
+export interface UpdateNotePayload {
+  id: string;
+  title?: string;
+  content?: string;
+  tag?: NoteTag;
+}
+
+const api = axios.create({
+  baseURL: "https://notehub-public.goit.study/api",
+  headers: {
+    Authorization: `Bearer ${myKey}`,
+  },
+});
+
+export const getNotes = async (
+  params: FetchNoteParams,
+): Promise<FetchNotesResponse> => {
+  const res = await api.get<FetchNotesResponse>("/notes", {
+    params: {
+      page: params.page,
+      perPage: params.perPage,
+      ...(params.search ? { search: params.search } : {}),
+    },
+  });
+  return res.data;
+};
+
+export const deleteNote = async (noteId: string) => {
+  const res = await api.delete<Note>(`/notes/${noteId}`);
+  return res.data;
+};
+
+export const createNote = async (payload: CreateNotePayload): Promise<Note> => {
+  const res = await api.post<Note>("/notes", payload);
+  return res.data;
+};
+
+export const updateNote = async ({
+  id,
+  ...patch
+}: UpdateNotePayload): Promise<Note> => {
+  const res = await api.patch<Note>(`/notes/${id}`, patch);
+  return res.data;
+};
