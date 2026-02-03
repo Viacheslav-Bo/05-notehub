@@ -4,11 +4,11 @@ import Pagination from "../Pagination/Pagination";
 import SearchBox from "../SearchBox/SearchBox";
 import { useDebouncedCallback } from "use-debounce";
 import Modal from "../Modal/Modal";
-import NoteForm, { type NoteFormValues } from "../NoteForm/NoteForm";
 import NoteList from "../NoteList/NoteList";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { createNote, getNotes } from "../../services/noteService";
-import toast, { Toaster } from "react-hot-toast";
+import NoteForm from "../NoteForm/NoteForm";
+import { useQuery } from "@tanstack/react-query";
+import { getNotes } from "../../services/noteService";
+import { Toaster } from "react-hot-toast";
 
 const PER_PAGE = 12;
 
@@ -39,25 +39,6 @@ export default function App() {
 
   const notes = data?.notes ?? [];
   const totalPages = data?.totalPages ?? 0;
-
-  const queryClient = useQueryClient();
-
-  const createNoteMutation = useMutation({
-    mutationFn: createNote,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["notes"] });
-      toast.success("Note created successfully");
-      closeModal();
-    },
-
-    onError: () => {
-      toast.error("Failed to create note");
-    },
-  });
-
-  const handleCreateNote = (values: NoteFormValues) => {
-    createNoteMutation.mutate(values);
-  };
 
   return (
     <>
@@ -95,7 +76,7 @@ export default function App() {
 
         {isModalOpen && (
           <Modal onClose={closeModal}>
-            <NoteForm onCancel={closeModal} onSubmit={handleCreateNote} />
+            <NoteForm onCancel={closeModal} />
           </Modal>
         )}
       </div>
